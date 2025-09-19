@@ -5,9 +5,10 @@ from selenium import webdriver
 @pytest.fixture
 def driver():
     # Setup: initialize the WebDriver
-    driver = webdriver.Firefox()
+    driver = webdriver.Chrome()
     driver.maximize_window()
     #referencia de um objeto
     yield driver
     # Teardown: close the WebDriver
     driver.quit()
+
