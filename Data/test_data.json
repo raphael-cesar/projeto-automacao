@@ -1,6 +1,10 @@
 {
   "tool_tips_url": "https://demoqa.com/tool-tips",
   "tool_tip_button_text": "You hovered over the Button",
-  "tool_tip_field_text": "You hovered over the text field"
+  "tool_tip_field_text": "You hovered over the text field",
+
+  "modal_dialogue_url": "https://demoqa.com/modal-dialogs",
+  "modal_large_text": "Large Modal",
+  "modal_small_text": "Small Modal"
 }
     

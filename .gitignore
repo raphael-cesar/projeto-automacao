@@ -1,6 +1,10 @@
 myProject/
 
+allure-results/
+
 __pychache__/
+
+assets/
 
 *.pyc
 *.pyo
@@ -8,3 +12,5 @@ __pychache__/
 *.png
 *.coverage
 *.DS_Store
+
+test_durations.log
