@@ -6,6 +6,9 @@ __pychache__/
 
 assets/
 
+htmlcov/
+.pytest_cache/
+
 *.pyc
 *.pyo
 *.pyd
@@ -14,3 +17,6 @@ assets/
 *.DS_Store
 
 test_durations.log
+test_report.csv
+report.html
+dashboard.html
