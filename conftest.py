@@ -7,6 +7,8 @@ from selenium import webdriver
 from pathlib import Path
 from Utils.data_loader import load_json_data
 import csv
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
 
 report_data = []
 
@@ -49,38 +51,60 @@ def pytest_runtest_teardown(item):
         f.write(msg + "\n")
 
 
-# #Choose your browser
-# def pytest_addoption(parser):
-#     '''
-#         Choose your browser when running pytest
-#         pytest --browser = your_browser
-#     '''
-#     parser.addoption("--browser", action="store", default="chrome", help="browser to execute tests (chrome or firefox)")
+#Choose your browser
+def pytest_addoption(parser):
+    '''
+        Choose your browser when running pytest
+        pytest --browser = your_browser
+    '''
+    parser.addoption("--browser", action="store", default="chrome", help="browser to execute tests (chrome or firefox)")
 
-@pytest.fixture(params=["chrome", "firefox"],scope="function")
-def driver(request):
-    '''
-        Define your browsers options with a Selenium WebDriver instance
-    '''
-    #browser = request.config.getoption("--browser").lower()
-    browser = request.param
+def pytest_generate_tests(metafunc):
+    if "browser" in metafunc.fixturenames:
+        browser = metafunc.config.getoption("browser").split(",")
+        metafunc.parametrize("browser", browser)
+
+@pytest.fixture(params=["chrome", "firefox"], scope="function")
+def driver(browser):
     if browser == "chrome":
-        driver_instance = webdriver.Chrome()
+        options = ChromeOptions()
     elif browser == "firefox":
-        driver_instance = webdriver.Firefox()
+        options = FirefoxOptions()
     else:
-        raise ValueError(f"Browser '{browser}' is not supported.")
-    
-    # attach the chosen browser name to the test item so other hooks can access it
-    try:
-        request.node.browser = browser
-    except Exception:
-        # if for any reason we cannot attach, continue without failing
-        pass
+        raise ValueError(f"Browser not supported: {browser}")
 
-    driver_instance.maximize_window()
-    yield driver_instance
-    driver_instance.quit()
+    driver = webdriver.Remote(
+        command_executor="http://localhost:4444/wd/hub",
+        options=options,
+    )
+
+    yield driver
+    driver.quit()
+
+# @pytest.fixture(params=["chrome", "firefox"],scope="function")
+# def driver(request):
+#     '''
+#         Define your browsers options with a Selenium WebDriver instance
+#     '''
+#     #browser = request.config.getoption("--browser").lower()
+#     browser = request.param
+#     if browser == "chrome":
+#         driver_instance = webdriver.Chrome()
+#     elif browser == "firefox":
+#         driver_instance = webdriver.Firefox()
+#     else:
+#         raise ValueError(f"Browser '{browser}' is not supported.")
+    
+#     # attach the chosen browser name to the test item so other hooks can access it
+#     try:
+#         request.node.browser = browser
+#     except Exception:
+#         # if for any reason we cannot attach, continue without failing
+#         pass
+
+#     driver_instance.maximize_window()
+#     yield driver_instance
+#     driver_instance.quit()
     
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
@@ -164,6 +188,8 @@ def session_resource():
     print("\n[SETUP] session_resource")
     yield "session fixture"
     print("[TEARDOWN] session_resource")
+
+
 
 # #SCREENSHOT ON FAILURE
 # @pytest.hookimpl(hookwrapper=True)
